@@ -3,140 +3,216 @@
 import { api } from "@/lib/api";
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ChevronLeftIcon } from "lucide-react";
 import { toast, Toaster } from "sonner";
 
-export default function Edit() {
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ChevronLeft, Loader2 } from "lucide-react";
+
+type Goal = {
+    name_desire: string;
+    description_desire: string;
+    tariff: number;
+    collected: number;
+};
+
+const FormSkeleton = () => (
+    <Card className="w-full max-w-lg">
+        <CardHeader>
+            <Skeleton className="h-8 w-48" />
+            <Skeleton className="h-4 w-full mt-2" />
+        </CardHeader>
+        <CardContent className="space-y-6">
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-full" />
+            </div>
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-24 w-full" />
+            </div>
+            <div className="space-y-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-10 w-full" />
+            </div>
+        </CardContent>
+        <CardFooter>
+            <Skeleton className="h-10 w-full" />
+        </CardFooter>
+    </Card>
+);
+
+const EditForm = ({
+    formData,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    initialCollected
+}: {
+    formData: Omit<Goal, 'collected'>;
+    handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+    handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    isSubmitting: boolean;
+    initialCollected: number;
+}) => (
+    <Card className="w-full max-w-lg animate-fade-in">
+        <form onSubmit={handleSubmit}>
+            <CardHeader>
+                <CardTitle className="text-3xl">Edit Impian</CardTitle>
+                <CardDescription>Perbarui detail impianmu di sini. Setiap perubahan kecil adalah langkah maju!</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="grid w-full items-center gap-2">
+                    <Label htmlFor="name_desire">Nama Impian</Label>
+                    <Input
+                        id="name_desire"
+                        name="name_desire"
+                        type="text"
+                        placeholder="Contoh: Liburan ke Bali"
+                        value={formData.name_desire}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="grid w-full items-center gap-2">
+                    <Label htmlFor="description_desire">Deskripsi</Label>
+                    <Textarea
+                        id="description_desire"
+                        name="description_desire"
+                        placeholder="Jelaskan mengapa impian ini penting bagimu..."
+                        value={formData.description_desire}
+                        onChange={handleChange}
+                        rows={4}
+                    />
+                </div>
+                <div className="grid w-full items-center gap-2">
+                    <Label htmlFor="tariff">Target Dana (Rp)</Label>
+                    <Input
+                        id="tariff"
+                        name="tariff"
+                        type="number"
+                        placeholder="Contoh: 5000000"
+                        value={formData.tariff}
+                        onChange={handleChange}
+                        required
+                        min={initialCollected}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                        Dana terkumpul saat ini: {initialCollected.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}
+                    </p>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
+                </Button>
+            </CardFooter>
+        </form>
+    </Card>
+);
+
+export default function EditPage() {
     const params = useParams();
     const id = params.id as string;
     const router = useRouter();
 
-    const [loading, setLoading] = useState(true);
+    const [initialData, setInitialData] = useState<Goal | null>(null);
+    const [formData, setFormData] = useState({
+        name_desire: '',
+        description_desire: '',
+        tariff: 0,
+    });
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState<string | null>(null);
-
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [tariff, setTariff] = useState(0);
-    const [data, setData] = useState<any>(null);
-
-    const handleSubmitEdit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        try {
-            const response = await api.put(`/update-desire/${id}`, {
-                name_desire: title,
-                description_desire: description,
-                tariff: tariff,
-            });
-            if (response.status === 200) {
-                toast.success("Goal updated successfully!", {
-                    style: {
-                        backgroundColor: "#107e31ff",
-                        color: "#f9fafb",
-                        border: "none",
-                        boxShadow: "0 4px 14px rgba(0, 0, 0, 0.5)",
-                    },
-                });
-                router.push(`/detail/${id}`);
-            } else {
-                console.error("Failed to update desire");
-                setError("Failed to update desire.");
-            }
-        } catch (error) {
-            console.error("Error updating desire:", error);
-            setError("Error update desire.");
-        }
-    };
 
     useEffect(() => {
         if (!id) return;
 
         const fetchData = async () => {
+            setIsLoading(true);
             try {
                 const response = await api.get(`/desire/${id}`);
-                const fetchedData = response.data;
-                setData(fetchedData);
-                setTitle(fetchedData.name_desire);
-                setDescription(fetchedData.description_desire || '');
-                setTariff(fetchedData.tariff || 0);
-            } catch (error) {
-                console.error("Error fetching desire data:", error);
-                setError("Failed to fetch data desire.");
+                const fetchedData: Goal = response.data;
+                setInitialData(fetchedData);
+                setFormData({
+                    name_desire: fetchedData.name_desire,
+                    description_desire: fetchedData.description_desire || '',
+                    tariff: fetchedData.tariff || 0,
+                });
+            } catch (err) {
+                console.error("Gagal mengambil data:", err);
+                setError("Tidak dapat memuat data impian. Silakan coba lagi.");
+                toast.error("Gagal memuat data impian.");
             } finally {
-                setLoading(false);
+                setIsLoading(false);
             }
         };
+
         fetchData();
     }, [id]);
 
-    if (loading) {
-        return <p className="text-center">Loading...</p>;
-    }
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: name === 'tariff' ? Number(value) : value }));
+    };
 
-    if (error) {
-        return <p>Error: {error}</p>;
-    }
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if ((initialData?.collected ?? 0) > formData.tariff) {
+            toast.error("Target dana tidak boleh lebih kecil dari dana yang sudah terkumpul.");
+            return;
+        }
+        setIsSubmitting(true);
+
+        toast.promise(api.put(`/update-desire/${id}`, formData), {
+            loading: 'Menyimpan perubahan...',
+            success: () => {
+                router.push(`/detail/${id}`);
+                return "Impian berhasil diperbarui!";
+            },
+            error: (err) => {
+                console.error("Gagal memperbarui:", err);
+                return "Gagal menyimpan perubahan. Coba lagi.";
+            },
+            finally: () => {
+                setIsSubmitting(false);
+            },
+        });
+    };
 
     return (
-        <div className="w-full flex flex-col items-center justify-center space-y-4 min-h-screen p-5">
-            <Toaster position="top-right"/>
-            <nav className="w-full absolute top-0 px-20 flex justify-between items-center p-2 bg-gray-100 shadow-md">
-                <ul>
-                    <Link href={`/detail/${id}`} className="absolute top-0 left-0 flex items-center">
-                        <Button variant="secondary" size="icon" className="size-8 m-3">
-                            <ChevronLeftIcon />
-                        </Button>
-                        <span>Detail</span>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+            <Toaster position="top-center" richColors />
+            <div className="w-full max-w-lg mb-4">
+                <Button asChild variant="ghost">
+                    <Link href={`/detail/${id}`}>
+                        <ChevronLeft className="mr-2 h-4 w-4" />
+                        Kembali ke Detail
                     </Link>
-                </ul>
-                <ul>
-                    <li className="inline-block mr-4">
-                        <Link href={"/dashboard/add"}>
-                            <Button variant={"ghost"}>Add New Goal</Button>
-                        </Link>
-                    </li>
-                    <li className="inline-block mr-4">
-                        <Link href={"/dashboard"}>
-                            <Button variant={"ghost"}>Dashboard</Button>
-                        </Link>
-                    </li>
-                </ul>
-            </nav>
-            <h1 className="text-2xl font-bold w-full text-center">
-                Edit Desire
-            </h1>
+                </Button>
+            </div>
 
-            <form onSubmit={handleSubmitEdit}
-                className="flex flex-col mt-6 space-y-4 w-full max-w-md">
-                <label htmlFor="title">title</label>
-                <input
-                    type="text"
-                    id="title"
-                    className="border p-2 rounded"
-                    placeholder="Enter goal title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
+            {isLoading ? (
+                <FormSkeleton />
+            ) : error ? (
+                <p className="text-red-500">{error}</p>
+            ) : (
+                <EditForm
+                    formData={formData}
+                    handleChange={handleChange}
+                    handleSubmit={handleSubmit}
+                    isSubmitting={isSubmitting}
+                    initialCollected={initialData?.collected ?? 0}
                 />
-                <label htmlFor="description">description</label>
-                <textarea
-                    id="description"
-                    className="border p-2 rounded"
-                    placeholder="Enter goal description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-                <label htmlFor="tariff">tariff</label>
-                <input
-                    type="number"
-                    id="tariff"
-                    className="border p-2 rounded"
-                    placeholder="Enter goal tariff"
-                    value={tariff}
-                    onChange={(e) => setTariff(Number(e.target.value))} />
-                <p>Collected: {(data.collected ? data.collected : 0).toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</p>
-                <Button type="submit" className="bg-blue-700">Update</Button>
-            </form>
+            )}
         </div>
-    )
+    );
 }

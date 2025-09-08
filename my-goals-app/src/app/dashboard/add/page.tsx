@@ -1,131 +1,150 @@
 'use client';
 
 import { api } from "@/lib/api";
-import { useState } from "react";
+import { useState, useRef, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { logout } from "@/app/actions/logout";
 import { toast, Toaster } from "sonner";
 
-export default function Add() {
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { ChevronLeft, Loader2, Image as ImageIcon, X } from "lucide-react";
+import { ImageUploader } from "@/components/goals/ImageUploader";
 
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [tariff, setTariff] = useState(0);
+export default function AddGoalPage() {
+    const router = useRouter();
+    const [formData, setFormData] = useState({
+        name_desire: '',
+        description_desire: '',
+        tariff: '',
+    });
     const [image, setImage] = useState<File | null>(null);
-    const [error, setError] = useState("")
+    const [preview, setPreview] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('name_desire', title);
-        formData.append('description_desire', description);
-        formData.append('tariff', tariff.toString());
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+    };
 
-        if (image) {
-            formData.append('image', image);
-        }
+    const handleImageChange = (file: File) => {
+        setImage(file);
+        setPreview(URL.createObjectURL(file));
+    };
 
-        if(title === "" || tariff === 0){
-            setError("required title and tariff")
-        }
-
-        api.post('/add-desire', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        })
-        .then(() => {
-            toast.success("Goal added successfully!", {
-                style: {
-                    backgroundColor: "#107e31ff",
-                    color: "#f9fafb",
-                    border: "none",
-                    boxShadow: "0 4px 14px rgba(0, 0, 0, 0.5)",
-                },
-            });
-        })
-        .catch(error => {
-            console.error("Error adding goal:", error);
-        })
-        .finally(() => {
-            setTitle('');
-            setDescription('');
-            setTariff(0);
-            setImage(null);
-        });
+    const handleRemoveImage = () => {
+        if (preview) URL.revokeObjectURL(preview);
+        setImage(null);
+        setPreview(null);
     }
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!formData.name_desire.trim() || !formData.tariff || Number(formData.tariff) <= 0) {
+            toast.error("Nama Impian dan Target Dana wajib diisi dengan benar.");
+            return;
         }
+
+        setIsSubmitting(true);
+        const formPayload = new FormData();
+        formPayload.append('name_desire', formData.name_desire);
+        formPayload.append('description_desire', formData.description_desire);
+        formPayload.append('tariff', formData.tariff);
+        if (image) {
+            formPayload.append('image', image);
+        }
+
+        toast.promise(api.post('/add-desire', formPayload, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+        }), {
+            loading: 'Menyimpan impian barumu...',
+            success: () => {
+                router.push('/dashboard');
+                return "Impian baru berhasil dibuat!";
+            },
+            error: (err) => {
+                console.error("Error saat menambah impian:", err);
+                return "Gagal membuat impian. Silakan coba lagi.";
+            },
+            finally: () => {
+                setIsSubmitting(false);
+            }
+        });
     };
 
     return (
-        <div className="w-full h-screen flex flex-col items-center justify-center p-4">
-            <nav className="w-full fixed top-0 px-20 flex justify-between items-center p-2 bg-gray-100 shadow-md">
-                <ul>
-                    <h1 className="font-bold font-2xl">Kepengen</h1>
-                </ul>
-                <ul>
-                    <li className="inline-block mr-4">
-                        <Link href={"/dashboard"}>
-                            <Button variant={"ghost"}>Dashboard</Button>
-                        </Link>
-                    </li>
-                    <li className="inline-block mr-4">
-                        <form action={logout}>
-                            <Button variant={"destructive"}>Logout</Button>
-                        </form>
-                    </li>
-                </ul>
-            </nav>
-            <Toaster position="top-right"/>
-            <h1 className="text-4xl font-bold">Add New Goal</h1>
-            <p className="mt-4 text-lg">This is the page to add a new goal.</p>
-            <p className="mt-2 text-sm text-gray-500">
-                Use the form below to create a new goal.
-            </p>
-            <form onSubmit={handleSubmit} className="flex flex-col mt-6 space-y-4 w-full max-w-md">
-                <label htmlFor="title">title</label>
-                <input
-                    type="text"
-                    id="title"
-                    className="border p-2 rounded"
-                    placeholder="Enter goal title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
-                <label htmlFor="description">description</label>
-                <textarea
-                    id="description"
-                    className="border p-2 rounded"
-                    placeholder="Enter goal description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                />
-                <label htmlFor="tariff">tariff</label>
-                <input
-                    type="number"
-                    id="tariff"
-                    className="border p-2 rounded"
-                    placeholder="Enter goal tariff"
-                    value={tariff}
-                    onChange={(e) => setTariff(Number(e.target.value))}
-                />
-                <label htmlFor="image">Image</label>
-                <input
-                    id="image"
-                    className="border p-2 rounded"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                />
-                {error && <p className="text-red-700 text-sm text-center">{error}</p>}
-                <Button type="submit" className="w-full bg-blue-700">Add</Button>
-            </form>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-4">
+            <Toaster position="top-center" richColors />
+            <div className="w-full max-w-lg mb-4">
+                <Button asChild variant="ghost">
+                    <Link href="/dashboard">
+                        <ChevronLeft className="mr-2 h-4 w-4" />
+                        Kembali ke Dashboard
+                    </Link>
+                </Button>
+            </div>
+
+            <Card className="w-full max-w-lg animate-fade-in">
+                <form onSubmit={handleSubmit}>
+                    <CardHeader>
+                        <CardTitle className="text-3xl">Buat Impian Baru</CardTitle>
+                        <CardDescription>Mimpi besar dimulai dari langkah pertama. Ayo mulai rencanakan impianmu di sini!</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <ImageUploader
+                            image={image}
+                            preview={preview}
+                            onImageChange={handleImageChange}
+                            onRemoveImage={handleRemoveImage}
+                        />
+                        <div className="grid w-full items-center gap-2">
+                            <Label htmlFor="name_desire">Nama Impian</Label>
+                            <Input
+                                id="name_desire"
+                                name="name_desire"
+                                type="text"
+                                placeholder="Contoh: Motor Baru"
+                                value={formData.name_desire}
+                                onChange={handleInputChange}
+                                required
+                            />
+                        </div>
+                        <div className="grid w-full items-center gap-2">
+                            <Label htmlFor="description_desire">Deskripsi (Opsional)</Label>
+                            <Textarea
+                                id="description_desire"
+                                name="description_desire"
+                                placeholder="Jelaskan detail impianmu..."
+                                value={formData.description_desire}
+                                onChange={handleInputChange}
+                            />
+                        </div>
+                        <div className="grid w-full items-center gap-2 mb-4">
+                            <Label htmlFor="tariff">Target Dana (Rp)</Label>
+                            <Input
+                                id="tariff"
+                                name="tariff"
+                                type="number"
+                                placeholder="Contoh: 25000000"
+                                value={formData.tariff}
+                                onChange={handleInputChange}
+                                required
+                                min="1"
+                            />
+                        </div>
+                    </CardContent>
+                    <CardFooter>
+                        <Button type="submit" className="w-full" disabled={isSubmitting}>
+                            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            {isSubmitting ? "Menyimpan..." : "Buat Impian"}
+                        </Button>
+                    </CardFooter>
+                </form>
+            </Card>
         </div>
     );
 }
