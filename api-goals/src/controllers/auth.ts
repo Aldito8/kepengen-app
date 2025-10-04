@@ -27,8 +27,8 @@ export async function register(req: Request, res: Response) {
         const token = signToken({ id: data.id, email: data.email, username: data.username, role: 'user' })
 
         res.cookie('token', token, {
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000,
         })
         return res.status(200).json({
@@ -71,8 +71,8 @@ export async function login(req: Request, res: Response) {
         const userData = verifyToken(token)
 
         res.cookie('token', token, {
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000,
         })
 
