@@ -1,7 +1,7 @@
 'use client';
 
 import { api } from "@/lib/api";
-import { useState, useRef, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast, Toaster } from "sonner";
@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, Loader2, Image as ImageIcon, X } from "lucide-react";
+import { ChevronLeft, Loader2 } from "lucide-react";
 import { ImageUploader } from "@/components/goals/ImageUploader";
 
 export default function AddGoalPage() {

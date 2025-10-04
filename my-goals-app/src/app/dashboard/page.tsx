@@ -40,8 +40,12 @@ export default async function Home() {
             </main>
         );
 
-    } catch (error: any) {
-        console.error("Gagal mengambil data impian:", error?.response?.data || error.message);
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Gagal mengambil data impian:", error.message);
+        } else {
+            console.error("Gagal mengambil data impian:", error);
+        }
         redirect('/login');
     }
 }

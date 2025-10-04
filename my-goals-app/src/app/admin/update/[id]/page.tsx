@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import { use, useEffect, useState } from "react";
 import { toast, Toaster } from "sonner";
 
-export default function edit({ params }: { params: Promise<{ id: string }> }) {
+export default function Edit({ params }: { params: Promise<{ id: string }> }) {
     const { id } = use(params);
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');

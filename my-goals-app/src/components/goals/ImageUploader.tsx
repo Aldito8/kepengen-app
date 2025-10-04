@@ -4,7 +4,6 @@ import { Button } from "../ui/button";
 import { ImageIcon, X } from "lucide-react";
 
 export const ImageUploader = ({
-    image,
     preview,
     onImageChange,
     onRemoveImage

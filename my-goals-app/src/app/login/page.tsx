@@ -38,11 +38,18 @@ export default function Login() {
             } else {
                 setError(data.message || 'Email atau password salah.');
             }
-        } catch (err: any) {
-            const errorMessage = err.response?.data?.message || 'Terjadi kesalahan saat login.';
-            setError(errorMessage);
-            console.error('Error during login:', err);
+        } catch (error) {
+            if (error instanceof Error) {
+                const axiosError = error as { response?: { data?: { message?: string } } };
+                const errorMessage = axiosError.response?.data?.message || 'Terjadi kesalahan saat login.';
+                setError(errorMessage);
+                console.error('Error during login:', errorMessage);
+            } else {
+                console.error('Error during login:', error);
+                setError('Terjadi kesalahan saat login.');
+            }
         }
+
     };
 
     return (
