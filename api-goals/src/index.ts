@@ -35,6 +35,8 @@ app.put('/users/:id', updateUser)
 app.delete('/users/:id', deleteUser)
 console.log(process.env.CORS_ALLOWED_ORIGINS)
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+// app.listen(port, () => {
+//     console.log(`Example app listening on port ${port}`)
+// })
+
+export default app
