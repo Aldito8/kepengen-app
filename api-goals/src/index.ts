@@ -5,8 +5,6 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { upload } from './utils/multer';
 import { deleteUser, getUser, getUserDetail, updateUser } from './controllers/admin';
-import dotenv from "dotenv";
-dotenv.config();
 
 const app = express()
 const port = process.env.PORT;
@@ -33,10 +31,8 @@ app.get('/users', getUser)
 app.get('/users/:id', getUserDetail)
 app.put('/users/:id', updateUser)
 app.delete('/users/:id', deleteUser)
-console.log(process.env.CORS_ALLOWED_ORIGINS)
 
-app.get("/", (req, res) => {
-    res.json({ message: "Express API is running" });
-});
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
 
-export default app;
