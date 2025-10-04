@@ -1,3 +1,5 @@
+'use client'
+
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { api } from "@/lib/api";
@@ -46,5 +48,6 @@ export default async function Home() {
         } else {
             console.error("Gagal mengambil data impian:", error);
         }
+        redirect('/login');
     }
 }
