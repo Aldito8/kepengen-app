@@ -46,6 +46,5 @@ export default async function Home() {
         } else {
             console.error("Gagal mengambil data impian:", error);
         }
-        redirect('/login');
     }
 }
