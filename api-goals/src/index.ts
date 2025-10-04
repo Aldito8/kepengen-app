@@ -32,9 +32,12 @@ app.get('/users/:id', getUserDetail)
 app.put('/users/:id', updateUser)
 app.delete('/users/:id', deleteUser)
 
-app.get("/", (req, res) => {
-    res.json({ message: "Express API is running 🚀" });
-});
+// app.get("/", (req, res) => {
+//     res.json({ message: "Express API is running 🚀" });
+// });
 
-export default app;
+// export default app;
 
+app.listen(port, () => {
+    console.log(`server is running on port ${port}`)
+})
