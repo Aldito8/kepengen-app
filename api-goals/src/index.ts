@@ -35,6 +35,8 @@ app.put('/users/:id', updateUser)
 app.delete('/users/:id', deleteUser)
 console.log(process.env.CORS_ALLOWED_ORIGINS)
 
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+app.get("/", (req, res) => {
+    res.json({ message: "Express API is running" });
+});
+
+export default app;
