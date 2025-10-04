@@ -33,6 +33,7 @@ export default function Login() {
                 if (data.userData.role === "admin") {
                     router.push('/admin');
                 } else {
+                    console.log('login success')
                     router.push('/dashboard');
                 }
             } else {
