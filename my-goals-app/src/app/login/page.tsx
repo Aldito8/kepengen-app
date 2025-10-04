@@ -72,14 +72,14 @@ export default function Login() {
 
                         {error && <p className='text-red-600 text-sm text-center pt-4'>{error}</p>}
 
-                        <a href="#" className="text-xs text-gray-500 hover:underline my-4 block text-center">Lupa kata sandi anda?</a>
-
                         <button
                             type="submit"
-                            className="w-full mt-2 px-8 py-3 bg-teal-500 text-white font-bold rounded-full uppercase tracking-wider hover:bg-teal-600 transition duration-200 disabled:bg-teal-300"
+                            className="w-full mt-6 px-8 py-3 bg-teal-500 text-white font-bold rounded-full uppercase tracking-wider hover:bg-teal-600 transition duration-200 disabled:bg-teal-300"
                         >
                             Masuk
                         </button>
+
+                        <a href="/register" className="md:hidden text-md text-gray-500 hover:underline my-4 block text-center">Buat Akun</a>
                     </form>
                 </div>
 

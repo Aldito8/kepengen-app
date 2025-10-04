@@ -63,7 +63,7 @@ const EditForm = ({
     <Card className="w-full max-w-lg animate-fade-in">
         <form onSubmit={handleSubmit}>
             <CardHeader>
-                <CardTitle className="text-3xl">Edit Impian</CardTitle>
+                <CardTitle className="text-3xl">Sunting Impian</CardTitle>
                 <CardDescription>Perbarui detail impianmu di sini. Setiap perubahan kecil adalah langkah maju!</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">

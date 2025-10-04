@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { apiServer } from "@/lib/api";
+import { api } from "@/lib/api";
 import { Toaster } from "sonner";
 import { Header } from "@/components/goals/Header";
 import { DashboardStats } from "@/components/goals/DashboardStats";
@@ -17,7 +17,7 @@ export default async function Home() {
             redirect("/login");
         }
 
-        const res = await apiServer.get("/desire", {
+        const res = await api.get("/desire", {
             headers: { Cookie: `token=${token}` },
         });
 

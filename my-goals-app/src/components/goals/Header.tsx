@@ -21,7 +21,7 @@ export const Header = () => {
                 </Link>
                 <form action={logout}>
                     <Button type="submit" variant="destructive">
-                        Logout
+                        Keluar
                     </Button>
                 </form>
             </div>

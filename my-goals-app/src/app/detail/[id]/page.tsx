@@ -117,7 +117,7 @@ const ActionButtons = ({ goalId, onDelete, onAddInstallment }: { goalId: string;
             </Dialog>
 
             <Link href={`/edit/${goalId}`} className="w-full col-span-2 md:col-span-1">
-                <Button size="lg" variant="outline" className="w-full"><Edit className="mr-2 h-5 w-5" /> Edit</Button>
+                <Button size="lg" variant="outline" className="w-full"><Edit className="mr-2 h-5 w-5" /> Sunting</Button>
             </Link>
 
             <AlertDialog>

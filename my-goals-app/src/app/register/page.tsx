@@ -86,6 +86,8 @@ export default function Register() {
                         >
                             Daftar
                         </button>
+
+                        <a href="/login" className="md:hidden text-md text-gray-500 hover:underline my-4 block text-center">Akun sudah ada</a>
                     </form>
                 </div>
 
