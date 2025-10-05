@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { api, apiSSR } from "@/lib/api";
+import { api } from "@/lib/api";
 import { Toaster } from "sonner";
 import { Header } from "@/components/goals/Header";
 import { DashboardStats } from "@/components/goals/DashboardStats";

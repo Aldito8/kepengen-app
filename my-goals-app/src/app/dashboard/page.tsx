@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { api, apiSSR } from "@/lib/api";
+import { api } from "@/lib/api";
 import { Toaster } from "sonner";
 import { Goal } from "../../types/goals";
 import { Header } from "@/components/goals/Header";
@@ -12,7 +12,6 @@ export default async function Home() {
     try {
         const cookieStore = cookies();
         const token = (await cookieStore).get("token")?.value;
-        console.log(token)
         if (!token) {
             redirect("/login");
         }
@@ -41,11 +40,12 @@ export default async function Home() {
         );
 
     } catch (error) {
-        if (error instanceof Error) {
-            console.error("Gagal mengambil data impian:", error.message);
-        } else {
-            console.error("Gagal mengambil data impian:", error);
-        }
-        redirect('/login');
+        console.log(error)
+        // if (error instanceof Error) {
+        //     console.error("Gagal mengambil data impian:", error.message);
+        // } else {
+        //     console.error("Gagal mengambil data impian:", error);
+        // }
+        // redirect('/login');
     }
 }
