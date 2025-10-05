@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { api } from "@/lib/api";
+import { api, apiSSR } from "@/lib/api";
 import { Toaster } from "sonner";
 import { Header } from "@/components/goals/Header";
 import { DashboardStats } from "@/components/goals/DashboardStats";
@@ -11,16 +11,13 @@ import { Goal } from "@/types/goals";
 export default async function Home() {
     try {
         const cookieStore = cookies();
-        const token = (await cookieStore).get("token")?.value;
+        const cookieHeader = (await cookieStore).get("token")?.value
+            ? `token=${(await cookieStore).get("token")?.value}`
+            : "";
 
-        if (!token) {
-            redirect("/login");
-        }
+        if (!cookieHeader) redirect("/login");
 
-        const res = await api.get("/desire", {
-            headers: { Cookie: `token=${token}` },
-        });
-
+        const res = await apiSSR(cookieHeader).get("/desire");
         const goals: Goal[] = res.data;
 
         return (
