@@ -11,13 +11,16 @@ import { Goal } from "@/types/goals";
 export default async function Home() {
     try {
         const cookieStore = cookies();
-        const cookieHeader = (await cookieStore).get("token")?.value
-            ? `token=${(await cookieStore).get("token")?.value}`
-            : "";
+        const token = (await cookieStore).get("token")?.value;
 
-        if (!cookieHeader) redirect("/login");
+        if (!token) {
+            redirect("/login");
+        }
 
-        const res = await apiSSR(cookieHeader).get("/desire");
+        const res = await api.get("/desire", {
+            headers: { Cookie: `token=${token}` },
+        });
+
         const goals: Goal[] = res.data;
 
         return (

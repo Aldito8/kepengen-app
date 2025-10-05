@@ -9,15 +9,18 @@ import { GoalList } from "@/components/goals/GoalsLists";
 import { EmptyState } from "@/components/goals/EmptyState";
 
 export default async function Home() {
+    const cookieStore = cookies();
+    const token = (await cookieStore).get("token")?.value;
+    console.log(token)
     try {
-        const cookieStore = cookies();
-        const cookieHeader = (await cookieStore).get("token")?.value
-            ? `token=${(await cookieStore).get("token")?.value}`
-            : "";
+        if (!token) {
+            redirect("/login");
+        }
 
-        if (!cookieHeader) redirect("/login");
+        const res = await api.get("/desire", {
+            headers: { Cookie: `token=${token}` },
+        });
 
-        const res = await apiSSR(cookieHeader).get("/desire");
         const goals: Goal[] = res.data;
 
         return (
