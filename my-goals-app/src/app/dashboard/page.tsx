@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { api } from "@/lib/api";
+import { api, fetchCookie } from "@/lib/api";
 import { Toaster } from "sonner";
 import { Goal } from "../../types/goals";
 import { Header } from "@/components/goals/Header";
@@ -21,7 +21,7 @@ export default async function Home() {
             headers: { Cookie: `token=${token}` },
         });
 
-        const goals: Goal[] = res.data;
+        const goals: Goal[] = await fetchCookie('/desire', token);
 
         return (
             <main className="min-h-screen bg-gray-50">
