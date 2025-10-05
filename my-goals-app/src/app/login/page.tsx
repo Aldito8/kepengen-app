@@ -1,6 +1,6 @@
 'use client';
 import { api } from '@/lib/api';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 export default function Login() {
@@ -31,10 +31,10 @@ export default function Login() {
             const data = response.data;
             if (data.token) {
                 if (data.userData.role === "admin") {
-                    router.push('/admin');
+                    redirect('/admin');
                 } else {
                     console.log('login success')
-                    router.push('/dashboard');
+                    redirect('/dashboard');
                 }
             } else {
                 setError(data.message || 'Email atau password salah.');
