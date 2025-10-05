@@ -31,10 +31,10 @@ export default function Login() {
             const data = response.data;
             if (data.token) {
                 if (data.userData.role === "admin") {
-                    redirect('/admin');
+                    router.push('/admin');
                 } else {
                     console.log('login success')
-                    redirect('/dashboard');
+                    router.push('/dashboard');
                 }
             } else {
                 setError(data.message || 'Email atau password salah.');

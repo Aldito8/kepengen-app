@@ -9,10 +9,10 @@ import { GoalList } from "@/components/goals/GoalsLists";
 import { EmptyState } from "@/components/goals/EmptyState";
 
 export default async function Home() {
-    const cookieStore = cookies();
-    const token = (await cookieStore).get("token")?.value;
-    console.log(token)
     try {
+        const cookieStore = cookies();
+        const token = (await cookieStore).get("token")?.value;
+        console.log(token)
         if (!token) {
             redirect("/login");
         }
