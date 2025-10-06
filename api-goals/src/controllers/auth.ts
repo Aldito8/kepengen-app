@@ -27,9 +27,9 @@ export async function register(req: Request, res: Response) {
         const token = signToken({ id: data.id, email: data.email, username: data.username, role: 'user' })
 
         res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
+            // httpOnly: true,
+            // secure: true,
+            // sameSite: 'none',
             maxAge: 24 * 60 * 60 * 1000,
         });
 
