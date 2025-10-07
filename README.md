@@ -11,7 +11,6 @@ A simple yet effective savings tracker app that helps users **set financial goal
 **Database:** Supabase, PostgreSQL, 
 **ORM:**Prisma ORM
 **Language:** TypeScript / JavaScript  
-**Deployment:** (Vercel for frontend, Render/VPS for backend, etc.)
 
 ---
 
